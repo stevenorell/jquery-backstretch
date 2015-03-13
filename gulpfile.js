@@ -45,7 +45,9 @@ gulp.task('min', function(){
     .pipe(strip())
     .pipe(header(banner, { pkg : pkg, today: today, _: _ } ))
     .pipe(gulp.dest('.'))
-    .pipe(uglify())
+    .pipe(uglify({
+      preserveComments: 'some'
+    }))
     .pipe(rename({
       suffix: '.min'
     }))
