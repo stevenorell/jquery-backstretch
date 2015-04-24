@@ -1,4 +1,4 @@
-/*! Backstretch - v2.0.5 - 2015-03-13
+/*! Backstretch - v2.0.5 - 2015-04-23
 * http://srobbin.com/jquery-plugins/backstretch/
 * Copyright (c) 2015 Scott Robbin; Licensed MIT */
 
@@ -7,8 +7,8 @@
 
     $.fn.backstretch = function (images, options) {
     // We need at least one image or method name
-    if (images === undefined || images.length === 0) {
-      $.error("No images were supplied for Backstretch");
+    if (images === undefined || images === null || images.length === 0) {
+      Console.debug("Warning: No images were supplied for Backstretch");
     }
 
         if ($(window).scrollTop() === 0 ) {
