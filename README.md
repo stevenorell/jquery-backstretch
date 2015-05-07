@@ -37,6 +37,7 @@ Include the jQuery library (version 1.7 or newer) and Backstretch plugin files i
 | `fade` | This is the speed at which the image will fade in. Integers in milliseconds are accepted, as well as standard jQuery speed strings (slow, normal, fast). | Integer or String | 0 |
 | `duration` | The amount of time in between slides, when using Backstretch as a slideshow, expressed as the number of milliseconds. | Integer | 5000 |
 | `bleed` | The amount by which to bleed the wrapper off the containing element. Helps overcome pixel gaps caused by rounding errors with percentage-based elements. Note: this only works when using Backstretch on an element (not the body), and will add `overflow: hidden` to the containing element. | Number | 0 |
+| `parallax` | Adds a parallax effect to block-level backstretch elements | Boolean | false |
 
 ## Slideshow API
 
