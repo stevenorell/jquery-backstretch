@@ -34,7 +34,7 @@
       if (obj) {
 
         // Is this a method they're trying to execute?
-        if (typeof images == 'string' && typeof obj[images] == 'function') {
+        if (typeof images === 'string' && typeof obj[images] === 'function') {
           // Call the method
           obj[images](options);
 
@@ -76,6 +76,7 @@
     , duration: 5000    // Amount of time in between slides (if slideshow)
     , fade: 0           // Speed of fade transition between slides
     , bleed: 0          // The amount by which to bleed the backstretch image
+    , parallax: false   // Adds a parallax effect when scrolling to backstretch images
   };
 
   /* STYLES
@@ -114,11 +115,18 @@
   var Backstretch = function (container, images, options) {
     this.options = $.extend({}, $.fn.backstretch.defaults, options || {});
 
+    // If Parallax is turned on, force centeredY to false
+    if (this.options.parallax) {
+      this.options.centeredY = false;
+    }
+
     /* In its simplest form, we allow Backstretch to be called on an image path.
      * e.g. $.backstretch('/path/to/image.jpg')
      * So, we need to turn this back into an array.
      */
     this.images = $.isArray(images) ? images : [images];
+
+    this.$window = $(window);
 
     // Preload images
     $.each(this.images, function () {
@@ -175,7 +183,7 @@
     this.show(this.index);
 
     // Listen for resize
-    $(window).on('resize.backstretch', $.proxy(this.resize, this))
+    this.$window.on('resize.backstretch', $.proxy(this.resize, this))
              .on('orientationchange.backstretch', $.proxy(function () {
                 // Need to do this in order to get the right window height
                 if (this.isBody && window.pageYOffset === 0) {
@@ -183,6 +191,7 @@
                   this.resize();
                 }
              }, this));
+
   };
 
   /* PUBLIC METHODS
@@ -190,36 +199,77 @@
   Backstretch.prototype = {
       resize: function () {
         try {
-          var bgCSS = {left: 0, top: 0}
-            , rootWidth = this.isBody ? this.$root.width() : ( this.$root.innerWidth() + this.options.bleed * 2 )
-            , bgWidth = rootWidth
-            , rootHeight = this.isBody ? ( window.innerHeight ? window.innerHeight : this.$root.height() ) : ( this.$root.innerHeight() + ( this.options.bleed * 2 ) )
-            , bgHeight = bgWidth / this.$img.data('ratio')
-            , bgOffset;
+          var self = this;
+
+          this.bgCSS = {left: 0, top: 0};
+          this.rootWidth = this.isBody ? this.$root.width() : ( this.$root.innerWidth() + this.options.bleed * 2 );
+          this.bgWidth = this.rootWidth;
+          this.rootHeight = this.isBody ? ( window.innerHeight ? window.innerHeight : this.$root.height() ) : ( this.$root.innerHeight() + ( this.options.bleed * 2 ) );
+          this.bgHeight = this.bgWidth / this.$img.data('ratio');
+          this.bgOffset = 0;
 
             // Make adjustments based on image ratio
-            if (bgHeight >= rootHeight) {
-                bgOffset = (bgHeight - rootHeight) / 2;
-                if(this.options.centeredY) {
-                  bgCSS.top = '-' + bgOffset + 'px';
+            if (this.bgHeight >= this.rootHeight) {
+                if(this.options.parallax && !this.isBody) {
+                  this.bgOffset = this.rootHeight - this.bgHeight;
+                  this.bgCSS.top = this.bgOffset + 'px';
+                } else if(this.options.centeredY) {
+                  this.bgOffset = -1 * (this.bgHeight - this.rootHeight) / 2;
+                  this.bgCSS.top = this.bgOffset + 'px';
+                } else {
+                  this.bgOffset = 0;
                 }
             } else {
-                bgHeight = rootHeight;
-                bgWidth = bgHeight * this.$img.data('ratio');
-                bgOffset = (bgWidth - rootWidth) / 2;
+                this.bgHeight = this.rootHeight;
+                this.bgWidth = this.bgHeight * this.$img.data('ratio');
                 if(this.options.centeredX) {
-                  bgCSS.left = '-' + bgOffset + 'px';
+                  this.bgOffset = (this.bgWidth - this.rootWidth) / 2;
+                  this.bgCSS.left = '-' + this.bgOffset + 'px';
                 }
             }
 
-            this.$wrap.css({width: rootWidth, height: rootHeight})
-                      .find('img:not(.deleteable)').css({width: bgWidth, height: bgHeight}).css(bgCSS);
+            this.$wrap.css({width: this.rootWidth, height: this.rootHeight})
+                      .find('img:not(.deleteable)').css({width: this.bgWidth, height: this.bgHeight}).css(this.bgCSS);
+
+            if (this.options.parallax && !this.isBody) {
+              if (this.bgHeight > this.rootHeight) {
+                // Call parallax() once to set currently visible elements
+                this.parallax();
+
+                // Call parallax on scroll
+                this.$window.scroll(function(){
+                  self.parallax();
+                });
+              }
+            }
+
+            if (this.options.parallax && this.isBody) {
+              console.warn('Warning: Parallax cannot be applied to $.backstretch elements.');
+            }
+
         } catch(err) {
             // IE7 seems to trigger resize before the image is loaded.
             // This try/catch block is a hack to let it fail gracefully.
         }
 
         return this;
+      }
+
+    , parallax: function () {
+
+        this.isVisible = false;
+        this.pos = this.$root.offset().top - this.$window.scrollTop();
+
+        var viewArea = this.$window.height() + this.rootHeight
+        ,   distance = this.bgHeight - this.rootHeight;
+
+        // Determine if the backstretch instance is in the viewport
+        if (this.pos < this.$window.height() && this.pos + this.$root.height() > 0) {
+          this.isVisible = true;
+          this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
+          this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
+        }
+
       }
 
       // Show the slide at a certain position

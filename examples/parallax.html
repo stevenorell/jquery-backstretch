@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: Helvetica, Arial, sans-serif; line-height: 1.3em; -webkit-font-smoothing: antialiased; }
+    .container {
+      width: 90%;
+      margin: 20px auto 1000px;
+      background-color: #FFF;
+      padding: 20px;
+    }
+
+    h1 { height: 1000px; }
+
+    pre, code {
+      font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+      font-size: 12px;
+      color: #333;
+      -webkit-border-radius: 3px;
+      -moz-border-radius: 3px;
+      border-radius: 3px;
+    }
+    pre { border: 1px solid #CCC; background-color: #EEE; color: #333; padding: 10px; overflow: scroll; }
+    code { padding: 2px 4px; background-color: #F7F7F9; border: 1px solid #E1E1E8; color: #D14; }
+
+    .parallax {
+      height: 600px;
+      margin-bottom: 40px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Parallax Demo</h1>
+    <div class="parallax parallax1"></div>
+    <div class="parallax parallax2"></div>
+    <div class="parallax parallax3"></div>
+  </div>
+
+  <script src="../libs/jquery/jquery.js"></script>
+  <script src="../src/jquery.backstretch.js"></script>
+  <script>
+    $(".parallax1").backstretch("coffee.jpg", {
+      parallax: true
+    });
+    $(".parallax2").backstretch("dome.jpg", {
+      parallax: false
+    });
+    $.backstretch("pot-holder.jpg", {
+      parallax: true
+    });
+  </script>
+</body>
+</html>
