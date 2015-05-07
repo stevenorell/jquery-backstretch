@@ -192,11 +192,6 @@
                 }
              }, this));
 
-    var self = this;
-
-    this.$window.scroll(function(){
-      self.parallax();
-    });
   };
 
   /* PUBLIC METHODS
@@ -204,6 +199,8 @@
   Backstretch.prototype = {
       resize: function () {
         try {
+          var self = this;
+
           this.bgCSS = {left: 0, top: 0}
           this.rootWidth = this.isBody ? this.$root.width() : ( this.$root.innerWidth() + this.options.bleed * 2 )
           this.bgWidth = this.rootWidth
@@ -213,7 +210,7 @@
 
             // Make adjustments based on image ratio
             if (this.bgHeight >= this.rootHeight) {
-                if(this.options.parallax) {
+                if(this.options.parallax && !this.isBody) {
                   this.bgOffset = this.rootHeight - this.bgHeight;
                   this.bgCSS.top = this.bgOffset + 'px';
                 } else if(this.options.centeredY) {
@@ -233,6 +230,23 @@
 
             this.$wrap.css({width: this.rootWidth, height: this.rootHeight})
                       .find('img:not(.deleteable)').css({width: this.bgWidth, height: this.bgHeight}).css(this.bgCSS);
+
+            if (this.options.parallax && !this.isBody) {
+              if (this.bgHeight > this.rootHeight) {
+                // Call parallax() once to set currently visible elements
+                this.parallax();
+
+                // Call parallax on scroll
+                this.$window.scroll(function(){
+                  self.parallax();
+                });
+              }
+            }
+
+            if (this.options.parallax && this.isBody) {
+              console.warn('Warning: Parallax cannot be applied to $.backstretch elements.');
+            }
+
         } catch(err) {
             // IE7 seems to trigger resize before the image is loaded.
             // This try/catch block is a hack to let it fail gracefully.
@@ -242,15 +256,20 @@
       }
 
     , parallax: function () {
-        if (this.options.parallax) {
-          var isVisible = false
-          ,   pos = this.$root.offset().top - this.$window.scrollTop();
 
-          // Determine if the backstretch instance is in the viewport
-          if (pos < this.$window.height() && pos + this.$root.height() > 0) {
-            isVisible = true;
-          }
+        this.isVisible = false
+        this.pos = this.$root.offset().top - this.$window.scrollTop();
+
+        var viewArea = this.$window.height() + this.rootHeight
+        ,   distance = this.bgHeight - this.rootHeight;
+
+        // Determine if the backstretch instance is in the viewport
+        if (this.pos < this.$window.height() && this.pos + this.$root.height() > 0) {
+          this.isVisible = true;
+          this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
+          this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
         }
+
       }
 
       // Show the slide at a certain position
