@@ -34,7 +34,8 @@ gulp.task('lint', function(){
       browser: true,
       laxcomma: true,
       globals: {
-        'jQuery': true
+        'jQuery': true,
+        'console': true
       }
     }))
     .pipe(jshint.reporter('default'))

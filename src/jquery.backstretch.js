@@ -34,7 +34,7 @@
       if (obj) {
 
         // Is this a method they're trying to execute?
-        if (typeof images == 'string' && typeof obj[images] == 'function') {
+        if (typeof images === 'string' && typeof obj[images] === 'function') {
           // Call the method
           obj[images](options);
 
@@ -201,11 +201,11 @@
         try {
           var self = this;
 
-          this.bgCSS = {left: 0, top: 0}
-          this.rootWidth = this.isBody ? this.$root.width() : ( this.$root.innerWidth() + this.options.bleed * 2 )
-          this.bgWidth = this.rootWidth
-          this.rootHeight = this.isBody ? ( window.innerHeight ? window.innerHeight : this.$root.height() ) : ( this.$root.innerHeight() + ( this.options.bleed * 2 ) )
-          this.bgHeight = this.bgWidth / this.$img.data('ratio')
+          this.bgCSS = {left: 0, top: 0};
+          this.rootWidth = this.isBody ? this.$root.width() : ( this.$root.innerWidth() + this.options.bleed * 2 );
+          this.bgWidth = this.rootWidth;
+          this.rootHeight = this.isBody ? ( window.innerHeight ? window.innerHeight : this.$root.height() ) : ( this.$root.innerHeight() + ( this.options.bleed * 2 ) );
+          this.bgHeight = this.bgWidth / this.$img.data('ratio');
           this.bgOffset = 0;
 
             // Make adjustments based on image ratio
@@ -257,7 +257,7 @@
 
     , parallax: function () {
 
-        this.isVisible = false
+        this.isVisible = false;
         this.pos = this.$root.offset().top - this.$window.scrollTop();
 
         var viewArea = this.$window.height() + this.rootHeight
