@@ -1,4 +1,4 @@
-/*! Backstretch - v2.0.7 - 2015-05-7
+/*! Backstretch - v2.0.4 - 2015-05-7
 * http://srobbin.com/jquery-plugins/backstretch/
 * Copyright (c) 2015 Scott Robbin; Licensed MIT */
 

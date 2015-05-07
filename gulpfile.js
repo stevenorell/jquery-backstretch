@@ -59,7 +59,15 @@ gulp.task('default', ['lint', 'min']);
 
 gulp.task('bump', function(){
   var type = argv.type || 'patch';
+  var version = argv.version || null;
+  var args = {};
+
+  if (version) {
+    args.version = version;
+  } else {
+    args.type = type;
+  }
   gulp.src(['package.json', 'bower.json'])
-    .pipe(bump({ type: type }))
+    .pipe(bump(args))
     .pipe(gulp.dest('./'));
 });
