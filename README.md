@@ -119,6 +119,11 @@ $(window).on("backstretch.after", function (e, instance, index) {
 
 ## Changelog
 
+### Version 2.1
+
+* Added "parallax" option to give block-level backstretch elements a parallax effect
+* Added "bleed" option to bleed background image outside of it's container
+
 ### Version 2.0
 
 * Now accepts an array of images to create a slideshow
