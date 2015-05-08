@@ -230,7 +230,7 @@
         ,   distance = this.bgHeight - this.rootHeight;
 
         // Determine if the backstretch instance is in the viewport
-        if (this.pos < this.$window.height() && this.pos + this.$root.height() > 0) {
+        if (this.pos < this.$window.height() && this.pos + this.$root.outerHeight() > 0) {
           this.isVisible = true;
           this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
           this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
