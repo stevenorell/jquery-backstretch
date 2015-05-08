@@ -1,4 +1,4 @@
-/*! Backstretch - v2.0.4 - 2015-05-7
+/*! Backstretch - v2.1.1 - 2015-05-8
 * http://srobbin.com/jquery-plugins/backstretch/
 * Copyright (c) 2015 Scott Robbin; Licensed MIT */
 
@@ -230,7 +230,7 @@
         ,   distance = this.bgHeight - this.rootHeight;
 
         // Determine if the backstretch instance is in the viewport
-        if (this.pos < this.$window.height() && this.pos + this.$root.outerHeight() > 0) {
+        if (this.pos < this.$window.height() && this.pos + this.$root.height() > 0) {
           this.isVisible = true;
           this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
           this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
