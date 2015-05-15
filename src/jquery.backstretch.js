@@ -1,28 +1,17 @@
-/*
- * Backstretch
- * http://srobbin.com/jquery-plugins/backstretch/
- *
- * Copyright (c) 2013 Scott Robbin
- * Licensed under the MIT license.
- */
+/*! Backstretch - v2.1.1 - 2015-05-8
+* http://srobbin.com/jquery-plugins/backstretch/
+* Copyright (c) 2015 Scott Robbin; Licensed MIT */
 
 ;(function ($, window, undefined) {
   'use strict';
 
-  /* PLUGIN DEFINITION
-   * ========================= */
-
-  $.fn.backstretch = function (images, options) {
+    $.fn.backstretch = function (images, options) {
     // We need at least one image or method name
     if (images === undefined || images === null || images.length === 0) {
       console.debug("Warning: No images were supplied for Backstretch");
     }
 
-    /*
-     * Scroll the page one pixel to get the right window height on iOS
-     * Pretty harmless for everyone else
-    */
-    if ($(window).scrollTop() === 0 ) {
+        if ($(window).scrollTop() === 0 ) {
       window.scrollTo(0, 0);
     }
 
@@ -67,10 +56,7 @@
     return $(elem).data('backstretch') !== undefined;
   };
 
-  /* DEFAULTS
-   * ========================= */
-
-  $.fn.backstretch.defaults = {
+    $.fn.backstretch.defaults = {
       centeredX: true   // Should we center the image on the X axis?
     , centeredY: true   // Should we center the image on the Y axis?
     , duration: 5000    // Amount of time in between slides (if slideshow)
@@ -79,13 +65,7 @@
     , parallax: false   // Adds a parallax effect when scrolling to backstretch images
   };
 
-  /* STYLES
-   *
-   * Baked-in styles that we'll apply to our elements.
-   * In an effort to keep the plugin simple, these are not exposed as options.
-   * That said, anyone can override these in their own stylesheet.
-   * ========================= */
-  var styles = {
+    var styles = {
       wrap: {
           left: 0
         , top: 0
@@ -110,9 +90,7 @@
       }
   };
 
-  /* CLASS DEFINITION
-   * ========================= */
-  var Backstretch = function (container, images, options) {
+    var Backstretch = function (container, images, options) {
     this.options = $.extend({}, $.fn.backstretch.defaults, options || {});
 
     // If Parallax is turned on, force centeredY to false
@@ -120,11 +98,7 @@
       this.options.centeredY = false;
     }
 
-    /* In its simplest form, we allow Backstretch to be called on an image path.
-     * e.g. $.backstretch('/path/to/image.jpg')
-     * So, we need to turn this back into an array.
-     */
-    this.images = $.isArray(images) ? images : [images];
+        this.images = $.isArray(images) ? images : [images];
 
     this.$window = $(window);
 
@@ -136,13 +110,7 @@
     // Convenience reference to know if the container is body.
     this.isBody = container === document.body;
 
-    /* We're keeping track of a few different elements
-     *
-     * Container: the element that Backstretch was called on.
-     * Wrap: a DIV that we place the image into, so we can hide the overflow.
-     * Root: Convenience reference to help calculate the correct height.
-     */
-    this.$container = $(container);
+        this.$container = $(container);
     this.$root = this.isBody ? supportsFixedPosition ? $(window) : $(document) : this.$container;
 
     // Don't create a new wrap if one already exists (from a previous instance of Backstretch)
@@ -194,9 +162,7 @@
 
   };
 
-  /* PUBLIC METHODS
-   * ========================= */
-  Backstretch.prototype = {
+    Backstretch.prototype = {
       resize: function () {
         try {
           var self = this;
@@ -234,11 +200,11 @@
             if (this.options.parallax && !this.isBody) {
               if (this.bgHeight > this.rootHeight) {
                 // Call parallax() once to set currently visible elements
-                this.parallax();
+                this.render()
 
                 // Call parallax on scroll
                 this.$window.scroll(function(){
-                  self.parallax();
+                  self.render();
                 });
               }
             }
@@ -255,6 +221,7 @@
         return this;
       }
 
+      // Calculate the positioning of the parallax element
     , parallax: function () {
 
         this.isVisible = false;
@@ -264,10 +231,25 @@
         ,   distance = this.bgHeight - this.rootHeight;
 
         // Determine if the backstretch instance is in the viewport
-        if (this.pos < this.$window.height() && this.pos + this.$root.height() > 0) {
+        if (this.pos < this.$window.height() && this.pos + this.$root.outerHeight() > 0) {
           this.isVisible = true;
           this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
           this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
+        }
+
+      }
+
+      // Render the parallax effect, used on window.scroll
+    , render: function() {
+
+        var self = this;
+
+        if (!self.isBusy) {
+          self.isBusy = true;
+          window.requestAnimationFrame(function(){
+            self.parallax();
+            self.isBusy = false;
+          });
         }
 
       }
@@ -385,20 +367,7 @@
       }
   };
 
-  /* SUPPORTS FIXED POSITION?
-   *
-   * Based on code from jQuery Mobile 1.1.0
-   * http://jquerymobile.com/
-   *
-   * In a nutshell, we need to figure out if fixed positioning is supported.
-   * Unfortunately, this is very difficult to do on iOS, and usually involves
-   * injecting content, scrolling the page, etc.. It's ugly.
-   * jQuery Mobile uses this workaround. It's not ideal, but works.
-   *
-   * Modified to detect IE6
-   * ========================= */
-
-  var supportsFixedPosition = (function () {
+    var supportsFixedPosition = (function () {
     var ua = navigator.userAgent
       , platform = navigator.platform
         // Rendering engine is Webkit, and capture major version
