@@ -239,6 +239,7 @@
                 // Call parallax on scroll
                 this.$window.scroll(function(){
                   self.parallax();
+                  // TODO: use requestAnimationFrame to manage
                 });
               }
             }
