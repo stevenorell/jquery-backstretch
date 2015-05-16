@@ -11,7 +11,30 @@
       console.debug("Warning: No images were supplied for Backstretch");
     }
 
-        if ($(window).scrollTop() === 0 ) {
+    /**
+     * Provides requestAnimationFrame in a cross browser way.
+     * @author paulirish / http://paulirish.com/
+     */
+
+    if ( !window.requestAnimationFrame ) {
+
+      window.requestAnimationFrame = ( function() {
+
+        return window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+
+          window.setTimeout( callback, 1000 / 60 );
+
+        };
+
+      } )();
+
+    }
+
+    if ($(window).scrollTop() === 0 ) {
       window.scrollTo(0, 0);
     }
 
@@ -117,6 +140,8 @@
     var $existing = this.$container.children(".backstretch").first();
     this.$wrap = $existing.length ? $existing : $('<div class="backstretch"></div>').css(styles.wrap).appendTo(this.$container);
 
+    this.$img = this.$wrap.find('img:not(.deleteable)');
+
     // Non-body elements need some style adjustments
     if (!this.isBody) {
       // If the container is statically positioned, we need to make it relative,
@@ -178,10 +203,10 @@
             if (this.bgHeight >= this.rootHeight) {
                 if(this.options.parallax && !this.isBody) {
                   this.bgOffset = this.rootHeight - this.bgHeight;
-                  this.bgCSS.top = this.bgOffset + 'px';
+                  this.bgCSS.top = this.bgOffset;
                 } else if(this.options.centeredY) {
                   this.bgOffset = -1 * (this.bgHeight - this.rootHeight) / 2;
-                  this.bgCSS.top = this.bgOffset + 'px';
+                  this.bgCSS.top = this.bgOffset;
                 } else {
                   this.bgOffset = 0;
                 }
@@ -190,7 +215,7 @@
                 this.bgWidth = this.bgHeight * this.$img.data('ratio');
                 if(this.options.centeredX) {
                   this.bgOffset = (this.bgWidth - this.rootWidth) / 2;
-                  this.bgCSS.left = '-' + this.bgOffset + 'px';
+                  this.bgCSS.left = '-' + this.bgOffset;
                 }
             }
 
@@ -204,6 +229,7 @@
 
                 // Call parallax on scroll
                 this.$window.scroll(function(){
+                  self.parallax();
                   self.render();
                 });
               }
@@ -234,7 +260,6 @@
         if (this.pos < this.$window.height() && this.pos + this.$root.outerHeight() > 0) {
           this.isVisible = true;
           this.bgCSS.top = -1 * ( this.pos + this.rootHeight ) / viewArea * distance;
-          this.$wrap.find('img:not(.deleteable)').css(this.bgCSS);
         }
 
       }
@@ -246,8 +271,13 @@
 
         if (!self.isBusy) {
           self.isBusy = true;
+
+          // This is still a bit choppy on high resolution screens, I believe
+          // it is because 'top' is getting updated relative to a moving
+          // point (the $wrap element).
           window.requestAnimationFrame(function(){
-            self.parallax();
+            self.$img.css('top', Math.floor(self.bgCSS.top));
+            console.log(self.$img.css('top'));
             self.isBusy = false;
           });
         }
